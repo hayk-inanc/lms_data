@@ -1,3 +1,4 @@
+
 CREATE SCHEMA IF NOT EXISTS lms;
 
 SET search_path TO lms;
@@ -7,7 +8,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    email TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
     full_name TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('student', 'instructor', 'admin')),
     registered_at TIMESTAMP NOT NULL,
@@ -74,7 +75,7 @@ DROP TABLE IF EXISTS instructors;
 
 CREATE TABLE instructors (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL UNIQUE REFERENCES users(id),
+    user_id INT NOT NULL ,
     bio TEXT,
     rating NUMERIC(3,2),
     experience_years INT
@@ -152,8 +153,8 @@ INSERT INTO courses (title, category, level, price, published_at, is_active) VAL
 DROP TABLE IF EXISTS course_instructors;
 
 CREATE TABLE course_instructors (
-    course_id INT NOT NULL REFERENCES courses(id),
-    instructor_id INT NOT NULL REFERENCES instructors(id),
+    course_id INT NOT NULL,
+    instructor_id INT NOT NULL,
     PRIMARY KEY (course_id, instructor_id)
 );
 
@@ -202,7 +203,7 @@ DROP TABLE IF EXISTS modules;
 
 CREATE TABLE modules (
     id SERIAL PRIMARY KEY,
-    course_id INT NOT NULL REFERENCES courses(id),
+    course_id INT NOT NULL,
     title TEXT NOT NULL,
     order_index INT NOT NULL
 );
@@ -328,7 +329,7 @@ DROP TABLE IF EXISTS lessons;
 
 CREATE TABLE lessons (
     id SERIAL PRIMARY KEY,
-    module_id INT NOT NULL REFERENCES modules(id),
+    module_id INT NOT NULL ,
     title TEXT NOT NULL,
     lesson_type TEXT NOT NULL CHECK (lesson_type IN ('video', 'text', 'quiz')),
     duration_minutes INT NOT NULL,
@@ -466,8 +467,8 @@ DROP TABLE IF EXISTS enrollments;
 
 CREATE TABLE enrollments (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    course_id INT NOT NULL REFERENCES courses(id),
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
     enrolled_at TIMESTAMP NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('active', 'completed', 'cancelled'))
 );
@@ -565,8 +566,8 @@ DROP TABLE IF EXISTS progress;
 
 CREATE TABLE progress (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    lesson_id INT NOT NULL REFERENCES lessons(id),
+    user_id INT NOT NULL,
+    lesson_id INT NOT NULL,
     completed_at TIMESTAMP,
     progress_pct INT NOT NULL CHECK (progress_pct BETWEEN 0 AND 100)
 );
@@ -683,8 +684,8 @@ DROP TABLE IF EXISTS lesson_results;
 
 CREATE TABLE lesson_results (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    lesson_id INT NOT NULL REFERENCES lessons(id),
+    user_id INT NOT NULL,
+    lesson_id INT NOT NULL,
     score INT NOT NULL CHECK (score BETWEEN 0 AND 100),
     passed BOOLEAN NOT NULL,
     attempt_number INT NOT NULL CHECK (attempt_number >= 1),
@@ -800,8 +801,8 @@ DROP TABLE IF EXISTS payments;
 
 CREATE TABLE payments (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    course_id INT NOT NULL REFERENCES courses(id),
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
     amount NUMERIC(10,2) NOT NULL,
     payment_date TIMESTAMP NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('paid', 'failed', 'refunded')),
@@ -901,8 +902,8 @@ DROP TABLE IF EXISTS certificates;
 
 CREATE TABLE certificates (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    course_id INT NOT NULL REFERENCES courses(id),
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
     issued_at TIMESTAMP NOT NULL,
     UNIQUE (user_id, course_id)
 );
@@ -975,8 +976,8 @@ DROP TABLE IF EXISTS reviews;
 
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    course_id INT NOT NULL REFERENCES courses(id),
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
     rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment TEXT,
     created_at TIMESTAMP NOT NULL,
@@ -1046,5 +1047,4 @@ INSERT INTO reviews (user_id, course_id, rating, comment, created_at) VALUES
 (49, 13, 4, 'ML basics are well presented.', '2024-03-16 16:00:00'),
 
 (50, 15, 5, 'ETL concepts explained clearly.', '2024-03-21 12:00:00');
-
 
